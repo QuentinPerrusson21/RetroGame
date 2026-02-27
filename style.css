@@ -1,0 +1,440 @@
+/* --- VARIABLES THEMES (MONOCHROME & DARK MODE) --- */
+:root {
+    /* Thème CLAIR (Par défaut) */
+    --bg-body: #ffffff;       /* Fond blanc pur */
+    --bg-card: #ffffff;       /* Cartes blanches */
+    --text-main: #000000;     /* Texte noir pur */
+    --text-inv: #ffffff;      /* Texte inversé (blanc) */
+    --border-color: #000000;  /* Bordures noires */
+    --shadow-color: #000000;  /* Ombres noires */
+    --hard-shadow: 5px 5px 0px var(--shadow-color); /* Ombre "dure" rétro */
+}
+
+/* Thème SOMBRE (Activé via JS) */
+body.dark-mode {
+    --bg-body: #111111;        /* Noir presque pur */
+    --bg-card: #000000;        /* Noir pur pour les cartes */
+    --text-main: #ffffff;      /* Texte blanc */
+    --text-inv: #000000;       /* Texte inversé (noir) */
+    --border-color: #ffffff;   /* Bordures blanches */
+    --shadow-color: #ffffff;   /* Ombres blanches (Effet Néon brut) */
+}
+
+/* --- RESET & GLOBAL --- */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-body);
+    /* Petit motif de points subtil pour ne pas faire "vide" */
+    background-image: radial-gradient(var(--text-main) 1px, transparent 1px);
+    background-size: 20px 20px;
+    background-attachment: fixed; /* Le fond ne bouge pas */
+    min-height: 100vh;
+    color: var(--text-main);
+    line-height: 1.6;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* --- HEADER --- */
+header {
+    background: var(--bg-card);
+    padding: 1.5rem;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 3px solid var(--border-color);
+}
+
+header h1 {
+    font-size: 2.5rem;
+    text-transform: uppercase;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--text-main);
+    margin-bottom: 1rem;
+}
+
+/* Bouton Thème */
+.btn-theme {
+    display: block;
+    margin: 0 auto 1rem auto;
+    padding: 8px 20px;
+    background: var(--bg-body);
+    color: var(--text-main);
+    border: 2px solid var(--border-color);
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    transition: 0.2s;
+    text-transform: uppercase;
+}
+
+.btn-theme:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px var(--shadow-color);
+}
+
+.btn-theme:active {
+    transform: translate(4px, 4px);
+    box-shadow: none;
+}
+
+/* Navigation */
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+nav a {
+    text-decoration: none;
+    color: var(--text-main);
+    font-weight: 700;
+    padding: 0.6rem 1.2rem;
+    border: 2px solid transparent;
+    border-radius: 0; 
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+nav a:hover {
+    background: var(--text-main);
+    color: var(--text-inv);
+    border-color: var(--text-main);
+}
+
+/* --- CARROUSEL --- */
+.slideshow-container {
+    max-width: 900px;
+    position: relative;
+    margin: 3rem auto;
+    border: 3px solid var(--border-color);
+    box-shadow: var(--hard-shadow); 
+    background: var(--bg-card);
+}
+
+.mySlides img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(100%);
+    transition: filter 0.3s;
+}
+
+.slideshow-container:hover .mySlides img {
+    filter: grayscale(0%);
+}
+
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 16px;
+    color: var(--text-inv);
+    background: var(--text-main);
+    font-weight: bold;
+    font-size: 24px;
+    border: none;
+    transition: 0.3s;
+}
+.next { right: 0; }
+.prev:hover, .next:hover { background: var(--text-dim); }
+
+.dot {
+    height: 12px; width: 12px;
+    margin: 0 5px;
+    background-color: transparent;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    display: inline-block;
+    cursor: pointer;
+}
+.active, .dot:hover { background-color: var(--text-main); }
+
+/* --- CONTENU --- */
+.container {
+    max-width: 1300px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+/* Intro Section */
+.intro-card {
+    text-align: center;
+    margin-bottom: 4rem;
+    padding: 2rem;
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
+    box-shadow: var(--hard-shadow);
+}
+
+.intro-card h2 {
+    font-size: 2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    color: var(--text-main);
+}
+
+.features-badges {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    font-weight: 700;
+    color: var(--text-main);
+    text-transform: uppercase;
+}
+.features-badges span {
+    border: 1px solid var(--border-color);
+    padding: 5px 10px;
+    background: transparent;
+}
+
+/* --- GRILLE --- */
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 3rem;
+    align-items: stretch;
+}
+
+/* --- CARTE DE JEU (STYLE BRUTALISTE) --- */
+.game-card {
+    background: var(--bg-card);
+    border: 3px solid var(--border-color);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    height: 100%;
+    box-shadow: var(--hard-shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.game-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0px var(--shadow-color);
+}
+
+/* Header de la carte */
+.card-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.card-header h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin: 0;
+    color: var(--text-main);
+}
+
+.score-badge {
+    background: var(--text-main);
+    color: var(--text-inv);
+    padding: 4px 10px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+/* Zone Canvas */
+.canvas-wrapper {
+    position: relative;
+    width: 100%;
+    height: 480px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+    border: 3px solid var(--border-color);
+    background: #000; /* Toujours noir pour le jeu */
+}
+
+canvas {
+    display: block;
+    max-width: 100%; 
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Game Over Overlay */
+.game-over-overlay {
+    display: none;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--text-inv);
+    background: var(--text-main);
+    padding: 10px 20px;
+    text-transform: uppercase;
+    border: 2px solid var(--text-inv);
+    text-align: center;
+    width: 80%;
+}
+
+/* Footer de la carte */
+.card-footer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-top: auto;
+}
+
+.score-live {
+    font-family: 'Courier New', monospace;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: var(--text-main);
+}
+
+/* Bouton Noir & Blanc */
+.restart-btn {
+    display: block;
+    margin: 15px auto;
+    padding: 12px 40px;
+    
+    background: var(--text-main);
+    color: var(--text-inv);
+    border: 2px solid var(--border-color);
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    width: fit-content;
+    min-width: 160px;
+}
+
+.restart-btn:hover {
+    background: var(--bg-card);
+    color: var(--text-main);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+}
+
+.restart-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: none;
+    background: var(--text-main);
+    color: var(--text-inv);
+}
+
+/* --- FOOTER SITE --- */
+.game-footer {
+    background: var(--text-main); 
+    color: var(--text-inv);
+    padding: 4rem 1rem;
+    margin-top: 5rem;
+    text-align: center;
+    border-top: 5px solid var(--border-color);
+}
+
+.footer-container {
+    display: flex;
+    justify-content: center;
+    gap: 4rem;
+    flex-wrap: wrap;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.footer-section h3 {
+    color: var(--text-inv);
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    font-weight: 800;
+    border-bottom: 2px solid var(--text-inv);
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+.contact-button {
+    display: inline-block;
+    padding: 10px 25px;
+    border: 2px solid var(--text-inv);
+    background: transparent;
+    color: var(--text-inv);
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+    text-transform: uppercase;
+}
+
+.contact-button:hover {
+    background: var(--text-inv);
+    color: var(--text-main);
+}
+
+.social-icons a {
+    color: #ccc;
+    margin: 0 10px;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+.social-icons a:hover { color: #fff; text-decoration: underline; }
+
+/* --- CONTROLES MOBILES --- */
+.mobile-controls {
+    display: none;
+    grid-template-columns: repeat(3, 50px);
+    gap: 10px;
+    justify-content: center;
+    margin-top: 1rem;
+}
+.btn-control {
+    width: 50px; height: 50px;
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
+    color: var(--text-main);
+    font-size: 1.5rem;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 2px 2px 0px var(--shadow-color);
+}
+.btn-control:active { 
+    background: var(--text-main);
+    color: var(--text-inv);
+    box-shadow: none;
+    transform: translate(2px, 2px);
+}
+
+.btn-up { grid-column: 2; }
+.btn-left { grid-column: 1; grid-row: 2; }
+.btn-right { grid-column: 3; grid-row: 2; }
+.btn-down { grid-column: 2; grid-row: 2; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .games-grid { grid-template-columns: 1fr; }
+    .mobile-controls { display: grid; }
+    .space-mobile, .breakout-mobile, .racing-mobile { display: flex; gap: 10px; justify-content: center; }
+    header h1 { font-size: 1.8rem; }
+}

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Mes Jeux Arcade - Nostalgie Flash</title>
+</head>
+<body>
+    <header>
+        <h1>Mes Jeux Arcade</h1>
+        <button id="theme-toggle" class="btn-theme"> MODE SOMBRE</button>
+        <nav>
+            <ul>
+                <li><a href="#about">À propos</a></li>
+                <li><a href="#snake-game">Snake</a></li>
+                <li><a href="#pacman-game">Pac-Man</a></li>
+                <li><a href="#space-game">Space Invaders</a></li>
+                <li><a href="#breakout-game">Casse-Briques</a></li>
+                <li><a href="#racing-game">Turbo Racer</a></li>
+                <li><a href="#contact-anchor">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="slideshow-container">
+        <div class="mySlides fade">
+            <img src="img/Snake.jpg" alt="Jeu Snake">
+            <div class="text">Snake</div>
+        </div>
+        <div class="mySlides fade">
+            <img src="img/pac.jpg" alt="Jeu Pacman">
+            <div class="text">Pacman</div>
+        </div>
+        <div class="mySlides fade">
+            <img src="img/brick.jpg" alt="Jeu Casse-Briques">
+            <div class="text">Casse-Briques</div>
+        </div>
+        <div class="mySlides fade">
+            <img src="img/space.jpg" alt="Jeu Space Invaders">
+            <div class="text">Space Invaders</div>
+        </div>
+        <div class="mySlides fade">
+            <img src="img/voiture.jpg" alt="Jeu Turbo Racer">
+            <div class="text">Turbo Racer</div>
+        </div>
+
+        <a class="prev" onclick="plusSlides(-1)">❮</a>
+        <a class="next" onclick="plusSlides(1)">❯</a>
+    </div>
+
+    <div style="text-align:center; margin: 1rem 0;">
+        <span class="dot" onclick="currentSlide(1)"></span>
+        <span class="dot" onclick="currentSlide(2)"></span>
+        <span class="dot" onclick="currentSlide(3)"></span>
+        <span class="dot" onclick="currentSlide(4)"></span>
+        <span class="dot" onclick="currentSlide(5)"></span>
+    </div>
+
+    <div class="container">
+        <section id="about" class="intro-card">
+            <h2>L'Arcade Réinventée</h2>
+            <p>Plongez dans un univers où le charme du <strong>rétro-gaming</strong> rencontre la fluidité des technologies actuelles. Nous avons recréé les pépites de l'époque Flash pour une expérience instantanée.</p>
+            <div class="features-badges">
+                <span>🎮 Gameplay Authentique</span>
+                <span>📱 Compatible Mobile</span>
+            </div>
+        </section>
+
+        <div class="games-grid">
+            
+            <section id="snake-game" class="game-card snake-theme">
+                <div class="card-header">
+                    <h2>Snake</h2>
+                    <div class="score-badge">🏆 <span id="snakeHighScore">0</span></div>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="snakeCanvas" width="400" height="400"></canvas>
+                    <div class="game-over-overlay" id="snakeGameOver">Game Over</div>
+                </div>
+                <div class="card-footer">
+                    <div class="score-live">Score: <span id="snakeScore">0</span></div>
+                    <button class="restart-btn" id="snakeRestartBtn">JOUER</button>
+                    <div class="mobile-controls">
+                        <button class="btn-control btn-up" id="snakeBtnUp">⬆</button>
+                        <button class="btn-control btn-left" id="snakeBtnLeft">⬅</button>
+                        <button class="btn-control btn-right" id="snakeBtnRight">➡</button>
+                        <button class="btn-control btn-down" id="snakeBtnDown">⬇</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="pacman-game" class="game-card pacman-theme">
+                <div class="card-header">
+                    <h2>Pac-Man</h2>
+                    <div class="score-badge">🏆 <span id="pacmanHighScore">0</span></div>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="pacmanCanvas" width="380" height="420"></canvas>
+                    <div class="game-over-overlay" id="pacmanMessage">Game Over</div>
+                </div>
+                <div class="card-footer">
+                    <div class="score-live">Score: <span id="pacmanScore">0</span></div>
+                    <button class="restart-btn" id="pacmanRestartBtn">JOUER</button>
+                    <div class="mobile-controls">
+                        <button class="btn-control btn-up" id="pacmanBtnUp">⬆</button>
+                        <button class="btn-control btn-left" id="pacmanBtnLeft">⬅</button>
+                        <button class="btn-control btn-right" id="pacmanBtnRight">➡</button>
+                        <button class="btn-control btn-down" id="pacmanBtnDown">⬇</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="space-game" class="game-card space-theme">
+                <div class="card-header">
+                    <h2>Space Invaders</h2>
+                    <div class="score-badge">🏆 <span id="spaceHighScore">0</span></div>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="spaceCanvas" width="480" height="400"></canvas>
+                    <div class="game-over-overlay" id="spaceMessage">DÉFAITE</div>
+                </div>
+                <div class="card-footer">
+                    <div class="score-live">Score: <span id="spaceScore">0</span></div>
+                    <button class="restart-btn" id="spaceRestartBtn">JOUER</button>
+                    <div class="mobile-controls space-mobile">
+                        <button class="btn-control btn-shoot" id="spaceBtnShoot">TIR</button>
+                        <div class="space-move-btns">
+                            <button class="btn-control btn-left" id="spaceBtnLeft">⬅</button>
+                            <button class="btn-control btn-right" id="spaceBtnRight">➡</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="breakout-game" class="game-card breakout-theme">
+                <div class="card-header">
+                    <h2>Casse-Briques</h2>
+                    <div class="score-badge">🏆 <span id="breakoutHighScore">0</span></div>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="breakoutCanvas" width="480" height="400"></canvas>
+                    <div class="game-over-overlay" id="breakoutMessage">PERDU</div>
+                </div>
+                <div class="card-footer">
+                    <div class="score-live">Score: <span id="breakoutScore">0</span></div>
+                    <button class="restart-btn" id="breakoutRestartBtn">JOUER</button>
+                    <div class="mobile-controls breakout-mobile">
+                        <button class="btn-control btn-left" id="breakoutBtnLeft">⬅</button>
+                        <button class="btn-control btn-right" id="breakoutBtnRight">➡</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="racing-game" class="game-card racing-theme">
+                <div class="card-header">
+                    <h2>Turbo Racer</h2>
+                    <div class="score-badge">🏆 <span id="racingHighScore">0</span></div>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="racingCanvas" width="400" height="500"></canvas>
+                    <div class="game-over-overlay" id="racingMessage">CRASH!</div>
+                </div>
+                <div class="card-footer">
+                    <div class="score-live">Score: <span id="racingScore">0</span></div>
+                    <button class="restart-btn" id="racingRestartBtn">JOUER</button>
+                    <div class="mobile-controls racing-mobile">
+                        <button class="btn-control btn-left" id="racingBtnLeft">⬅</button>
+                        <button class="btn-control btn-right" id="racingBtnRight">➡</button>
+                    </div>
+                </div>
+            </section>
+
+        </div> </div>
+
+    <footer id="contact-anchor" class="game-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>Contacte l'Arcade</h3>
+                <p>Un bug ? Une idée ?</p>
+                <br>
+                <a href="mailto:contact@mesjeuxarcade.com" class="contact-button">Envoyer un Mail</a>
+            </div>
+            <div class="footer-section">
+                <h3>Communauté</h3>
+                <div class="social-icons">
+                    <a href="#">Discord</a>
+                    <a href="#">Twitter</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <p>&copy; 2026 Mes Jeux Arcade.</p>
+                <p class="flash-note">Propulsé par la nostalgie.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="snake.js"></script>
+    <script src="pacman.js"></script>
+    <script src="space.js"></script>
+    <script src="breakout.js"></script>
+    <script src="racing.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
