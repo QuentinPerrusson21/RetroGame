@@ -229,7 +229,6 @@ nav a:hover {
     box-shadow: 7px 7px 0px var(--shadow-color);
 }
 
-/* Header de la carte */
 .card-header {
     width: 100%;
     display: flex;
@@ -257,7 +256,6 @@ nav a:hover {
     font-size: 0.9rem;
 }
 
-/* Zone Canvas */
 .canvas-wrapper {
     position: relative;
     width: 100%;
@@ -267,7 +265,7 @@ nav a:hover {
     align-items: center;
     margin-bottom: 1rem;
     border: 3px solid var(--border-color);
-    background: #000; /* Toujours noir pour le jeu */
+    background: #000; 
 }
 
 canvas {
@@ -401,7 +399,6 @@ canvas {
 }
 .social-icons a:hover { color: #fff; text-decoration: underline; }
 
-/* --- CONTROLES MOBILES --- */
 .mobile-controls {
     display: none;
     grid-template-columns: repeat(3, 50px);
@@ -438,15 +435,15 @@ canvas {
     .space-mobile, .breakout-mobile, .racing-mobile { display: flex; gap: 10px; justify-content: center; }
     header h1 { font-size: 1.8rem; }
 }
-/* --- LE NOUVEAU HEADER COMPACT --- */
+
 header {
     display: flex;
-    align-items: center; /* Aligne tout au centre verticalement */
-    justify-content: space-between; /* Pousse les éléments aux extrémités */
-    padding: 10px 30px; /* On réduit drastiquement les marges intérieures ! */
-    height: 70px; /* On fixe une petite hauteur */
-    background-color: #fff; /* Assure-toi que le fond correspond à ton thème */
-    border-bottom: 3px solid #000; /* Optionnel : une petite ligne de démarcation rétro */
+    align-items: center;
+    justify-content: space-between; 
+    padding: 10px 30px; 
+    height: 70px; 
+    background-color: #fff; 
+    border-bottom: 3px solid #000;
     box-sizing: border-box;
 }
 
@@ -520,34 +517,33 @@ body.dark-mode .burger-btn {
     color: #fff;
     border-color: #fff;
 }
-/* --- 1. RÈGLE GLOBALE ANTI-DÉBORDEMENT --- */
+
 html, body {
-    overflow-x: hidden; /* Empêche le défilement horizontal de gauche à droite */
+    overflow-x: hidden; 
     max-width: 100vw;
     margin: 0;
     padding: 0;
 }
 
-/* --- 2. RÉTRÉCISSEMENT DU HEADER SUR MOBILE --- */
 @media (max-width: 768px) {
     header {
-        padding: 10px 15px; /* On réduit les marges sur les côtés */
+        padding: 10px 15px; 
     }
 
     header h1 {
-        font-size: 1.2rem; /* Le titre devient plus petit (au lieu de 1.8rem) */
-        white-space: normal; /* Autorise le titre à passer sur 2 lignes si l'écran est minuscule */
+        font-size: 1.2rem;
+        white-space: normal;
         line-height: 1.1;
     }
 
     .btn-theme {
-        padding: 6px 10px; /* On rétrécit l'intérieur du bouton */
-        font-size: 0.75rem; /* Le texte du bouton devient plus petit */
+        padding: 6px 10px; 
+        font-size: 0.75rem; 
     }
 
     .burger-btn {
         margin-left: 10px;
-        padding: 4px 8px; /* On rétrécit aussi le burger */
+        padding: 4px 8px; 
         font-size: 1rem;
     }
 }
