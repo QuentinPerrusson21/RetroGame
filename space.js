@@ -33,26 +33,56 @@
     let alienDropDistance = 20;
     let wave = 1;
 
-    // --- INITIALISATION ---
-    function initGame() {
-        // ACTIVATION DU JEU
+    // --- GESTION DU COMPTE À REBOURS ---
+    function startCountdown() {
+        setupBoard();
+        
+        restartBtn.style.display = 'none';
+        gameMessage.style.display = 'block';
+        gameMessage.style.fontSize = '40px'; 
+        
+        let count = 3;
+        gameMessage.textContent = count;
+
+        const countdown = setInterval(() => {
+            count--;
+            if (count > 0) {
+                gameMessage.textContent = count;
+            } else if (count === 0) {
+                gameMessage.textContent = "GO !";
+            } else {
+                clearInterval(countdown);
+                gameMessage.style.display = 'none';
+                gameMessage.style.fontSize = ''; // On réinitialise la taille
+                startGameAction();
+            }
+        }, 1000);
+    }
+
+    // --- PRÉPARATION DU PLATEAU ---
+    function setupBoard() {
         window.jeuActif = "space";
 
         score = 0; 
         wave = 1;
         scoreElement.textContent = score;
-        alienSpeed = 1; // Vitesse initiale
+        alienSpeed = 1; 
         bullets = [];
         createAliens();
         
         player.x = canvas.width / 2 - player.width / 2;
         player.dx = 0;
 
-        gameMessage.style.display = 'none';
-        restartBtn.style.display = 'none';
+        // On dessine la grille initiale pour le décompte (sans l'effet de traînée)
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        drawPlayer();
+        drawAliens();
+    }
+
+    // --- LANCEMENT DE L'ACTION ---
+    function startGameAction() {
         gameRunning = true;
-        
-        // Relance la boucle
         if (animationId) cancelAnimationFrame(animationId);
         animate();
     }
@@ -63,7 +93,6 @@
             for (let c = 0; c < alienCols; c++) {
                 let alienX = (c * (alienWidth + alienPadding)) + alienOffsetLeft;
                 let alienY = (r * (alienHeight + alienPadding)) + alienOffsetTop;
-                // Couleurs rétro
                 let color = r === 0 ? '#ff073a' : r === 1 ? '#ffff00' : '#00ffff';
                 aliens.push({ x: alienX, y: alienY, width: alienWidth, height: alienHeight, color: color, alive: true });
             }
@@ -87,7 +116,6 @@
         drawAliens();
         drawBullets();
         
-        // Nouvelle vague ?
         if (aliens.every(a => !a.alive)) nextWave();
 
         animationId = requestAnimationFrame(animate);
@@ -96,14 +124,12 @@
     // --- LOGIQUE ---
     function updatePlayer() {
         player.x += player.dx;
-        // Limites
         if (player.x < 0) player.x = 0;
         if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
     }
 
     function shoot() {
         if (!gameRunning) return;
-        // Limite de tir (3 balles max à la fois)
         if (bullets.length < 3) {
              bullets.push({ 
                  x: player.x + player.width / 2 - 2.5, 
@@ -130,9 +156,7 @@
         for (let alien of aliens) {
             if (!alien.alive) continue;
             
-            // Touche les bords ?
             if (alien.x + alien.width > canvas.width || alien.x < 0) hitEdge = true;
-            // Touche le bas (Game Over) ?
             if (alien.y + alien.height > player.y) reachedBottom = true;
         }
 
@@ -150,7 +174,6 @@
         bullets.forEach((b, bIndex) => {
             aliens.forEach((a, aIndex) => {
                 if (a.alive && b.x < a.x + a.width && b.x + b.width > a.x && b.y < a.y + a.height && b.y + b.height > a.y) {
-                    // Touché !
                     a.alive = false;
                     bullets.splice(bIndex, 1);
                     score += 10 * wave;
@@ -162,7 +185,6 @@
                         localStorage.setItem('spaceHighScore', highScore);
                     }
                     
-                    // Accélération progressive
                     alienSpeed += 0.05;
                 }
             });
@@ -179,7 +201,7 @@
     function endGame() {
         gameRunning = false;
         cancelAnimationFrame(animationId);
-        gameMessage.textContent = "GAME OVER 💀";
+        gameMessage.textContent = "DÉFAITE 💀";
         gameMessage.style.display = 'block';
         restartBtn.textContent = "Recommencer";
         restartBtn.style.display = 'block';
@@ -188,8 +210,8 @@
     // --- DESSIN ---
     function drawPlayer() {
         ctx.fillStyle = player.color;
-        ctx.fillRect(player.x, player.y + 10, player.width, 10); // Base
-        ctx.fillRect(player.x + 10, player.y, 10, 10); // Canon
+        ctx.fillRect(player.x, player.y + 10, player.width, 10);
+        ctx.fillRect(player.x + 10, player.y, 10, 10);
     }
 
     function drawBullets() {
@@ -203,11 +225,9 @@
         aliens.forEach(a => {
             if (a.alive) {
                 ctx.fillStyle = a.color;
-                // Forme Alien Simple
-                ctx.fillRect(a.x + 5, a.y, a.width - 10, a.height); // Corps
-                ctx.fillRect(a.x, a.y + 5, 5, a.height - 10); // Bras G
-                ctx.fillRect(a.x + a.width - 5, a.y + 5, 5, a.height - 10); // Bras D
-                // Yeux
+                ctx.fillRect(a.x + 5, a.y, a.width - 10, a.height); 
+                ctx.fillRect(a.x, a.y + 5, 5, a.height - 10); 
+                ctx.fillRect(a.x + a.width - 5, a.y + 5, 5, a.height - 10); 
                 ctx.fillStyle = '#000';
                 ctx.fillRect(a.x + 8, a.y + 5, 4, 4);
                 ctx.fillRect(a.x + a.width - 12, a.y + 5, 4, 4);
@@ -215,16 +235,17 @@
         });
     }
 
-    // --- CONTRÔLES (PROTECTION ACTIVE) ---
+    // --- CONTRÔLES ---
     document.addEventListener('keydown', (e) => {
-        // Protection : Si ce n'est pas le tour de Space Invaders, on ne fait rien
         if (window.jeuActif !== "space") return;
 
         if (['ArrowLeft', 'ArrowRight', ' ', 'ArrowUp'].includes(e.key)) {
-            e.preventDefault(); // Stop Scroll
+            e.preventDefault(); 
         }
         
-        // Contrôles
+        // On bloque les mouvements si le jeu ne tourne pas (ex: pendant le décompte)
+        if (!gameRunning) return;
+
         if (e.key === 'ArrowLeft') player.dx = -player.speed;
         if (e.key === 'ArrowRight') player.dx = player.speed;
         if (e.key === ' ' || e.key === 'ArrowUp') shoot();
@@ -232,18 +253,15 @@
 
     document.addEventListener('keyup', (e) => {
         if (window.jeuActif !== "space") return;
-
         if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') player.dx = 0;
     });
 
-    // Contrôles Tactiles / Souris
     const btnLeft = document.getElementById('spaceBtnLeft');
     const btnRight = document.getElementById('spaceBtnRight');
     const btnShoot = document.getElementById('spaceBtnShoot');
     
-    // Fonction utilitaire pour lancer le jeu au clic tactile
     const handleInput = (action) => {
-        if (!gameRunning) initGame();
+        if (!gameRunning) return; // On empêche le tir ou le mouvement avant le "GO!"
         action();
     };
 
@@ -268,7 +286,8 @@
         });
     }
 
-    restartBtn.addEventListener('click', initGame);
+    // On branche le bouton jouer sur le décompte
+    restartBtn.addEventListener('click', startCountdown);
 
     // Écran titre
     ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);

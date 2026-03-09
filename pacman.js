@@ -7,7 +7,6 @@
     const restartBtn = document.getElementById('pacmanRestartBtn');
 
     const tileSize = 20;
-    // Grille 19x21 : 1=Mur, 0=Pastille, 2=Vide, 4=Fantômes (Départ)
     const mapLayout = [
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
@@ -33,35 +32,52 @@
     let highScore = parseInt(localStorage.getItem('pacmanHighScore')) || 0;
     let gameInterval;
     let gameRunning = false;
+    
     let mouthOpen = 0;
-    let mouthSpeed = 0.2;
+    let mouthSpeed = 0.04; 
+    const speed = 0.125;   
 
     highScoreElement.textContent = highScore;
     
-    // État du jeu
     let pacman = { x: 9, y: 16, dir: 0, nextDir: 0 };
     let ghosts = [];
     let pellets = [];
 
-    function initGame() {
-        // --- MODIFICATION 1 : ON ACTIVE CE JEU ---
-        window.jeuActif = "pacman";
-        // -----------------------------------------
+    function startCountdown() {
+        setupBoard();
+        restartBtn.style.display = 'none';
+        gameMessage.style.display = 'block';
+        gameMessage.style.fontSize = '40px';
+        
+        let count = 3;
+        gameMessage.textContent = count;
 
+        const countdown = setInterval(() => {
+            count--;
+            if (count > 0) {
+                gameMessage.textContent = count;
+            } else if (count === 0) {
+                gameMessage.textContent = "GO !";
+            } else {
+                clearInterval(countdown);
+                gameMessage.style.display = 'none';
+                gameMessage.style.fontSize = '';
+                startGameAction();
+            }
+        }, 1000);
+    }
+
+    function setupBoard() {
+        window.jeuActif = "pacman";
         score = 0; scoreElement.textContent = score;
-        gameMessage.style.display = 'none'; restartBtn.style.display = 'none';
         
-        // Reset Pacman
         pacman = { x: 9, y: 16, dir: 0, nextDir: 0 }; 
-        
-        // Reset Fantômes
         ghosts = [
-            { x: 9, y: 8, color: 'red', dir: 2 },   // Blinky
-            { x: 1, y: 1, color: 'pink', dir: 1 },  // Pinky
-            { x: 17, y: 1, color: 'cyan', dir: 2 }  // Inky
+            { x: 9, y: 8, color: 'red', dir: 2 },
+            { x: 1, y: 1, color: 'pink', dir: 1 },
+            { x: 17, y: 1, color: 'cyan', dir: 2 }
         ];
 
-        // Reset Pastilles
         pellets = [];
         for (let row = 0; row < mapLayout.length; row++) {
             for (let col = 0; col < mapLayout[row].length; col++) {
@@ -69,20 +85,18 @@
             }
         }
         
-        gameRunning = true;
-        if (gameInterval) clearInterval(gameInterval);
-        gameInterval = setInterval(update, 150); // Vitesse du jeu
+        draw();
     }
 
-    // --- MODIFICATION 2 : PROTECTION DES TOUCHES ---
-    document.addEventListener('keydown', (e) => {
-        // Si ce n'est pas le tour de Pacman, on arrête tout
-        if (window.jeuActif !== "pacman") return;
-        if (!gameRunning) return;
+    function startGameAction() {
+        gameRunning = true;
+        if (gameInterval) clearInterval(gameInterval);
+        gameInterval = setInterval(update, 16); 
+    }
 
-        if(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-            e.preventDefault(); // Empêche le scroll
-        }
+    document.addEventListener('keydown', (e) => {
+        if (window.jeuActif !== "pacman" || !gameRunning) return;
+        if(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) e.preventDefault(); 
 
         switch(e.key) {
             case 'ArrowRight': pacman.nextDir = 0; break;
@@ -91,54 +105,68 @@
             case 'ArrowUp': pacman.nextDir = 3; break;
         }
     });
-    // -----------------------------------------------
 
-    // Contrôles Boutons (Souris/Tactile) - Pas besoin de protection ici
     document.getElementById('pacmanBtnRight').addEventListener('click', () => pacman.nextDir = 0);
     document.getElementById('pacmanBtnDown').addEventListener('click', () => pacman.nextDir = 1);
     document.getElementById('pacmanBtnLeft').addEventListener('click', () => pacman.nextDir = 2);
     document.getElementById('pacmanBtnUp').addEventListener('click', () => pacman.nextDir = 3);
-
-    restartBtn.addEventListener('click', initGame);
+    restartBtn.addEventListener('click', startCountdown);
 
     function update() {
         if (!gameRunning) return;
         
-        // Logique de déplacement
         movePacman(); 
         moveGhosts(); 
         checkCollisions(); 
         
-        // Animation Bouche
         mouthOpen += mouthSpeed; 
         if (mouthOpen > 0.25 || mouthOpen < 0) mouthSpeed = -mouthSpeed;
         
-        // Victoire ?
         if (pellets.length === 0) gameOver(true);
         
         draw();
     }
 
     function movePacman() {
-        let nextX = pacman.x, nextY = pacman.y;
-        
-        // Tente de tourner (nextDir)
-        if (pacman.nextDir===0) nextX++; else if (pacman.nextDir===1) nextY++; 
-        else if (pacman.nextDir===2) nextX--; else if (pacman.nextDir===3) nextY--;
-        
-        if (!isWall(nextX, nextY)) { 
-            pacman.dir = pacman.nextDir; pacman.x = nextX; pacman.y = nextY; 
-        } else {
-            // Sinon continue tout droit (dir actuelle)
-            nextX = pacman.x; nextY = pacman.y;
-            if (pacman.dir===0) nextX++; else if (pacman.dir===1) nextY++; 
-            else if (pacman.dir===2) nextX--; else if (pacman.dir===3) nextY--;
-            
-            if (!isWall(nextX, nextY)) { pacman.x = nextX; pacman.y = nextY; }
+        if (
+            (pacman.dir === 0 && pacman.nextDir === 2) ||
+            (pacman.dir === 2 && pacman.nextDir === 0) ||
+            (pacman.dir === 1 && pacman.nextDir === 3) ||
+            (pacman.dir === 3 && pacman.nextDir === 1)
+        ) {
+            pacman.dir = pacman.nextDir;
         }
 
-        // Manger Pastille
-        const pIndex = pellets.findIndex(p => p.x === pacman.x && p.y === pacman.y);
+        let onGrid = Number.isInteger(pacman.x) && Number.isInteger(pacman.y);
+
+        if (onGrid) {
+            let nx = pacman.x, ny = pacman.y;
+            if (pacman.nextDir===0) nx++; else if (pacman.nextDir===1) ny++;
+            else if (pacman.nextDir===2) nx--; else if (pacman.nextDir===3) ny--;
+
+            if (!isWall(nx, ny)) {
+                pacman.dir = pacman.nextDir;
+            } else {
+                nx = pacman.x; ny = pacman.y;
+                if (pacman.dir===0) nx++; else if (pacman.dir===1) ny++;
+                else if (pacman.dir===2) nx--; else if (pacman.dir===3) ny--;
+
+                if (isWall(nx, ny)) return; 
+            }
+        }
+
+        // On avance doucement
+        if (pacman.dir === 0) pacman.x += speed;
+        else if (pacman.dir === 1) pacman.y += speed;
+        else if (pacman.dir === 2) pacman.x -= speed;
+        else if (pacman.dir === 3) pacman.y -= speed;
+
+        pacman.x = Math.round(pacman.x * 1000) / 1000;
+        pacman.y = Math.round(pacman.y * 1000) / 1000;
+
+        let cx = Math.round(pacman.x);
+        let cy = Math.round(pacman.y);
+        const pIndex = pellets.findIndex(p => p.x === cx && p.y === cy);
         if (pIndex !== -1) {
             pellets.splice(pIndex, 1); 
             score += 10; 
@@ -153,25 +181,28 @@
 
     function moveGhosts() {
         ghosts.forEach(ghost => {
-            // IA simple : choisit une direction valide au hasard (sauf demi-tour immédiat si possible)
-            let possible = [];
-            
-            // Teste les 4 directions : Droite(0), Bas(1), Gauche(2), Haut(3)
-            // On vérifie x+1, y+1, x-1, y-1
-            if (!isWall(ghost.x+1, ghost.y)) possible.push(0); 
-            if (!isWall(ghost.x, ghost.y+1)) possible.push(1);
-            if (!isWall(ghost.x-1, ghost.y)) possible.push(2); 
-            if (!isWall(ghost.x, ghost.y-1)) possible.push(3);
-            
-            // Essaie d'éviter le demi-tour (dir + 2 modulo 4)
-            let better = possible.filter(d => d !== (ghost.dir+2)%4);
-            
-            // Choisit une direction
-            let move = better.length > 0 ? better[Math.floor(Math.random()*better.length)] : possible[0];
-            
-            ghost.dir = move;
-            if(move===0) ghost.x++; else if(move===1) ghost.y++; 
-            else if(move===2) ghost.x--; else if(move===3) ghost.y--;
+            let onGrid = Number.isInteger(ghost.x) && Number.isInteger(ghost.y);
+
+            if (onGrid) {
+                let possible = [];
+                if (!isWall(ghost.x+1, ghost.y)) possible.push(0); 
+                if (!isWall(ghost.x, ghost.y+1)) possible.push(1);
+                if (!isWall(ghost.x-1, ghost.y)) possible.push(2); 
+                if (!isWall(ghost.x, ghost.y-1)) possible.push(3);
+                
+                let better = possible.filter(d => d !== (ghost.dir+2)%4);
+                let move = better.length > 0 ? better[Math.floor(Math.random()*better.length)] : possible[0];
+                
+                if (move !== undefined) ghost.dir = move;
+            }
+
+            if (ghost.dir === 0) ghost.x += speed;
+            else if (ghost.dir === 1) ghost.y += speed;
+            else if (ghost.dir === 2) ghost.x -= speed;
+            else if (ghost.dir === 3) ghost.y -= speed;
+
+            ghost.x = Math.round(ghost.x * 1000) / 1000;
+            ghost.y = Math.round(ghost.y * 1000) / 1000;
         });
     }
 
@@ -181,7 +212,13 @@
     
     function checkCollisions() { 
         for(let g of ghosts) {
-            if(g.x===pacman.x && g.y===pacman.y) gameOver(false); 
+            let dx = g.x - pacman.x;
+            let dy = g.y - pacman.y;
+            let distance = Math.sqrt(dx*dx + dy*dy);
+            
+            if (distance < 0.8) {
+                gameOver(false); 
+            }
         }
     }
 
@@ -195,11 +232,9 @@
     }
 
     function draw() {
-        // Fond Noir
         ctx.fillStyle = 'black'; 
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        // Murs Bleus
         ctx.fillStyle = '#2121ff';
         for(let r=0;r<mapLayout.length;r++) {
             for(let c=0;c<mapLayout[r].length;c++) {
@@ -207,7 +242,6 @@
             }
         }
 
-        // Pastilles
         ctx.fillStyle = '#ffb8ae'; 
         pellets.forEach(p => { 
             ctx.beginPath(); 
@@ -215,35 +249,28 @@
             ctx.fill(); 
         });
         
-        // Pacman
         const px = pacman.x*tileSize+tileSize/2;
         const py = pacman.y*tileSize+tileSize/2;
-        
-        // Rotation selon direction : 0=Dr, 1=Bas, 2=Ga, 3=Haut
-        // Angle de base en radians : 0, PI/2, PI, 3PI/2
         const rot = pacman.dir * 0.5 * Math.PI;
         
         ctx.fillStyle = 'yellow'; 
         ctx.beginPath(); 
-        // Arc de cercle avec ouverture de bouche
         ctx.arc(px, py, tileSize/2-2, rot + mouthOpen * Math.PI, rot + (2 - mouthOpen) * Math.PI); 
         ctx.lineTo(px, py); 
         ctx.fill();
         
-        // Fantômes
         ghosts.forEach(g => {
             const gx = g.x*tileSize+tileSize/2;
             const gy = g.y*tileSize+tileSize/2;
             ctx.fillStyle = g.color; 
             ctx.beginPath(); 
-            ctx.arc(gx, gy-2, tileSize/2-2, Math.PI, 0); // Tête ronde
-            ctx.lineTo(gx+tileSize/2-2, gy+tileSize/2-2); // Bas droite
-            ctx.lineTo(gx-tileSize/2+2, gy+tileSize/2-2); // Bas gauche
+            ctx.arc(gx, gy-2, tileSize/2-2, Math.PI, 0); 
+            ctx.lineTo(gx+tileSize/2-2, gy+tileSize/2-2); 
+            ctx.lineTo(gx-tileSize/2+2, gy+tileSize/2-2); 
             ctx.fill();
         });
     }
 
-    // Écran titre initial
     ctx.fillStyle='#000'; ctx.fillRect(0,0,canvas.width,canvas.height);
     ctx.fillStyle='yellow'; ctx.font='20px Courier New'; ctx.textAlign='center'; 
     ctx.fillText('PAC-MAN', canvas.width/2, canvas.height/2-20);

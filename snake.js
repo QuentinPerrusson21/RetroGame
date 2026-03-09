@@ -30,33 +30,65 @@
         ctx.fillText('Appuyez sur "Jouer"', canvas.width / 2, canvas.height / 2);
     }
 
-    function startGame() {
-        // --- ACTIVATION DU JEU ---
+    // --- GESTION DU COMPTE À REBOURS ---
+    function startCountdown() {
+        setupBoard();
+        
+        restartBtn.style.display = 'none';
+        
+        // CORRECTION DU CENTRAGE ICI
+        gameOverElement.style.display = 'flex'; 
+        gameOverElement.style.justifyContent = 'center';
+        gameOverElement.style.alignItems = 'center';
+        gameOverElement.style.fontSize = '50px'; 
+        
+        let count = 3;
+        gameOverElement.textContent = count;
+
+        const countdown = setInterval(() => {
+            count--;
+            if (count > 0) {
+                gameOverElement.textContent = count;
+            } else if (count === 0) {
+                gameOverElement.textContent = "GO !";
+            } else {
+                clearInterval(countdown);
+                gameOverElement.style.display = 'none';
+                gameOverElement.style.fontSize = ''; // On réinitialise la taille de police
+                startGameAction();
+            }
+        }, 1000);
+    }
+
+    // --- PRÉPARATION DU PLATEAU ---
+    function setupBoard() {
         window.jeuActif = "snake";
-        // -------------------------
 
         snake = [{ x: 10, y: 10 }];
-        velocity = { x: 1, y: 0 }; 
+        velocity = { x: 1, y: 0 }; // Le serpent partira vers la droite
         score = 0;
         scoreElement.textContent = score;
         generateFood();
         
+        // On dessine le plateau une première fois pour le décompte
+        clearCanvas();
+        drawFood();
+        drawSnake();
+    }
+
+    // --- LANCEMENT DE L'ACTION ---
+    function startGameAction() {
         gameRunning = true;
-        gameOverElement.style.display = 'none';
-        restartBtn.style.display = 'none';
-        
         if (gameLoop) clearInterval(gameLoop);
         gameLoop = setInterval(drawGame, 100); 
     }
 
     function drawGame() {
-        // --- COUPE-CIRCUIT ---
         if (window.jeuActif !== "snake") {
             clearInterval(gameLoop);
             gameRunning = false;
             return;
         }
-        // ---------------------
 
         if (!gameRunning) return;
         
@@ -131,20 +163,25 @@
     function endGame() {
         gameRunning = false;
         clearInterval(gameLoop);
-        gameOverElement.style.display = 'block';
+        
+        gameOverElement.textContent = "Game Over"; 
+        gameOverElement.style.display = 'flex'; 
+        gameOverElement.style.justifyContent = 'center';
+        gameOverElement.style.alignItems = 'center';
+        
         restartBtn.textContent = "Recommencer";
         restartBtn.style.display = 'block';
     }
 
     // --- CONTRÔLES ---
     document.addEventListener('keydown', (e) => {
-        // Protection : Si ce n'est pas le tour de Snake, on arrête tout
         if (window.jeuActif !== "snake") return;
 
         if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
             e.preventDefault(); 
-            if (!gameRunning) startGame(); 
         }
+
+        if (!gameRunning) return;
 
         switch(e.key) {
             case 'ArrowUp': if (velocity.y !== 1) velocity = { x: 0, y: -1 }; break;
@@ -154,9 +191,8 @@
         }
     });
 
-    // Contrôles Mobiles
     const handleMobile = (x, y) => {
-        if (!gameRunning) startGame();
+        if (!gameRunning) return;
         if ((x !== 0 && velocity.x !== -x) || (y !== 0 && velocity.y !== -y)) velocity = { x, y };
     };
 
@@ -165,7 +201,7 @@
     document.getElementById('snakeBtnLeft').addEventListener('click', () => handleMobile(-1, 0));
     document.getElementById('snakeBtnRight').addEventListener('click', () => handleMobile(1, 0));
 
-    restartBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startCountdown);
 
     drawIntro();
 })();

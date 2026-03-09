@@ -170,6 +170,24 @@
                     </div>
                 </div>
             </section>
+            <section id="doodle-game" class="game-card doodle-theme">
+                <div class="card-header">
+                    <h2>Jumper</h2>
+                    <div class="score-badge">🏆 <span id="doodleHighScore">0</span></div>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="doodleCanvas" width="320" height="500"></canvas>
+                    <div class="game-over-overlay" id="doodleMessage">PERDU</div>
+                </div>
+                <div class="card-footer">
+                    <div class="score-live">Score: <span id="doodleScore">0</span></div>
+                    <button class="restart-btn" id="doodleRestartBtn">JOUER</button>
+                    <div class="mobile-controls breakout-mobile">
+                        <button class="btn-control btn-left" id="doodleBtnLeft">⬅</button>
+                        <button class="btn-control btn-right" id="doodleBtnRight">➡</button>
+                    </div>
+                </div>
+            </section>
 
         </div> </div>
 
@@ -201,5 +219,6 @@
     <script src="breakout.js"></script>
     <script src="racing.js"></script>
     <script src="script.js"></script>
+    <script src="doodle.js"></script>
 </body>
 </html>

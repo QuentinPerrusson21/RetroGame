@@ -6,43 +6,65 @@
     const gameMessage = document.getElementById('racingMessage');
     const restartBtn = document.getElementById('racingRestartBtn');
 
-    // --- CONFIGURATION ---
     const carWidth = 40;
     const carHeight = 70;
-    // 3 voies centrées : x = 70, 200, 330 (sur 400px de large)
     const lanes = [70, 200, 330]; 
     
     let score = 0;
     let highScore = parseInt(localStorage.getItem('racingHighScore')) || 0;
     highScoreElement.textContent = highScore;
-    restartBtn.textContent = "Jouer";
 
     let gameRunning = false;
     let animationId;
     let speed = 5;
     let lineOffset = 0;
 
-    let player = { lane: 1, y: 400 }; // Le joueur est sur la voie du milieu (index 1)
+    let player = { lane: 1, x: 200, y: 400 }; 
     let enemies = [];
 
-    // --- INITIALISATION ---
-    function initGame() {
-        // ACTIVATION DU JEU
+    function startCountdown() {
+        setupBoard();
+        restartBtn.style.display = 'none';
+        gameMessage.style.display = 'block';
+        gameMessage.style.fontSize = '40px'; 
+        
+        let count = 3;
+        gameMessage.textContent = count;
+
+        const countdown = setInterval(() => {
+            count--;
+            if (count > 0) {
+                gameMessage.textContent = count;
+            } else if (count === 0) {
+                gameMessage.textContent = "GO !";
+            } else {
+                clearInterval(countdown);
+                gameMessage.style.display = 'none';
+                gameMessage.style.fontSize = ''; 
+                startGameAction();
+            }
+        }, 1000);
+    }
+
+    function setupBoard() {
         window.jeuActif = "racing";
         
         score = 0; scoreElement.textContent = score;
         speed = 5;
+        lineOffset = 0;
+        
         player.lane = 1;
+        player.x = lanes[1]; 
         enemies = [];
         
-        gameMessage.style.display = 'none';
-        restartBtn.style.display = 'none';
-        gameRunning = true;
-        
-        animate();
+        draw();
     }
 
-    // --- BOUCLE DE JEU ---
+    function startGameAction() {
+        gameRunning = true;
+        animate(); 
+    }
+
     function animate() {
         if (!gameRunning) return;
 
@@ -55,30 +77,28 @@
     }
 
     function update() {
-        // Défilement de la route
         lineOffset += speed;
         if (lineOffset >= 40) lineOffset = 0;
 
-        // Augmenter la difficulté
         score += 1;
         if (score % 500 === 0) speed += 0.5;
-        scoreElement.textContent = Math.floor(score / 10); // Affiche un score lisible
+        scoreElement.textContent = Math.floor(score / 10);
 
-        // Gestion des Ennemis
+        player.x += (lanes[player.lane] - player.x) * 0.15; 
+
         if (Math.random() < 0.02) spawnEnemy();
 
         for (let i = enemies.length - 1; i >= 0; i--) {
             enemies[i].y += speed;
 
-            // Collision
+            let enemyX = lanes[enemies[i].lane];
             if (
-                Math.abs(enemies[i].y - player.y) < carHeight - 10 && // Chevauchement vertical
-                enemies[i].lane === player.lane // Même voie
+                Math.abs(enemies[i].y - player.y) < carHeight - 10 && 
+                Math.abs(enemyX - player.x) < carWidth - 5 
             ) {
                 gameOver();
             }
 
-            // Suppression si hors écran
             if (enemies[i].y > canvas.height) {
                 enemies.splice(i, 1);
             }
@@ -86,72 +106,64 @@
     }
 
     function spawnEnemy() {
-        // Choisir une voie au hasard
         let lane = Math.floor(Math.random() * 3);
         
-        // Vérifier qu'il n'y a pas déjà une voiture trop proche sur cette voie
-        let tooClose = enemies.some(e => e.lane === lane && e.y < 150);
+        let tooCloseOnSameLane = enemies.some(e => e.lane === lane && e.y < 200);
+        if (tooCloseOnSameLane) return;
+
+        let occupiedLanesTop = new Set(
+            enemies.filter(e => e.y < 250).map(e => e.lane)
+        );
         
-        if (!tooClose) {
-            enemies.push({
-                lane: lane,
-                y: -100, // Commence au-dessus de l'écran
-                color: Math.random() > 0.5 ? '#ef4444' : '#3b82f6' // Rouge ou Bleu
-            });
+        if (occupiedLanesTop.size >= 2 && !occupiedLanesTop.has(lane)) {
+            return;
         }
+        
+        enemies.push({
+            lane: lane,
+            y: -100, 
+            color: Math.random() > 0.5 ? '#ef4444' : '#3b82f6' 
+        });
     }
 
     function draw() {
-        // 1. DESSINER LA ROUTE
         ctx.fillStyle = '#333';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Bandes herbe sur les côtés
         ctx.fillStyle = '#10b981';
         ctx.fillRect(0, 0, 20, canvas.height);
         ctx.fillRect(canvas.width - 20, 0, 20, canvas.height);
 
-        // Lignes blanches (bordures de route)
         ctx.fillStyle = '#fff';
         ctx.fillRect(25, 0, 5, canvas.height);
         ctx.fillRect(canvas.width - 30, 0, 5, canvas.height);
 
-        // Lignes pointillées centrales (qui bougent)
         ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
         for (let i = -1; i < 20; i++) {
-            // Ligne séparatrice 1 (entre voie 0 et 1) -> x ≈ 133
             ctx.fillRect(133, i * 40 + lineOffset, 4, 20);
-            // Ligne séparatrice 2 (entre voie 1 et 2) -> x ≈ 266
             ctx.fillRect(266, i * 40 + lineOffset, 4, 20);
         }
 
-        // 2. DESSINER LES ENNEMIS
         enemies.forEach(e => {
             drawCar(lanes[e.lane], e.y, e.color);
         });
 
-        // 3. DESSINER LE JOUEUR
-        drawCar(lanes[player.lane], player.y, '#f59e0b'); // Orange
+        drawCar(player.x, player.y, '#f59e0b'); 
     }
 
     function drawCar(x, y, color) {
-        // Corps de la voiture
         ctx.fillStyle = color;
-        // Ombre
         ctx.shadowColor = 'rgba(0,0,0,0.5)';
         ctx.shadowBlur = 10;
         ctx.fillRect(x - carWidth/2, y, carWidth, carHeight);
         ctx.shadowBlur = 0;
 
-        // Pare-brise
-        ctx.fillStyle = '#1e293b'; // Vitre sombre
+        ctx.fillStyle = '#1e293b'; 
         ctx.fillRect(x - carWidth/2 + 5, y + 10, carWidth - 10, 15);
 
-        // Toit
         ctx.fillStyle = 'rgba(0,0,0,0.2)';
         ctx.fillRect(x - carWidth/2 + 5, y + 30, carWidth - 10, 25);
 
-        // Phares (jaunes)
         ctx.fillStyle = '#fef08a';
         ctx.fillRect(x - carWidth/2 + 2, y + 2, 8, 5);
         ctx.fillRect(x + carWidth/2 - 10, y + 2, 8, 5);
@@ -160,6 +172,7 @@
     function gameOver() {
         gameRunning = false;
         cancelAnimationFrame(animationId);
+        gameMessage.textContent = "CRASH!";
         gameMessage.style.display = 'block';
         restartBtn.textContent = "Recommencer";
         restartBtn.style.display = 'block';
@@ -172,11 +185,9 @@
         }
     }
 
-    // --- CONTRÔLES ---
     function moveLeft() { if (player.lane > 0) player.lane--; }
     function moveRight() { if (player.lane < 2) player.lane++; }
 
-    // Clavier (Protection active)
     document.addEventListener('keydown', (e) => {
         if (window.jeuActif !== "racing") return;
         
@@ -189,7 +200,6 @@
         }
     });
 
-    // Boutons Mobiles / Souris
     document.getElementById('racingBtnLeft').addEventListener('click', () => {
         if (gameRunning) moveLeft();
     });
@@ -197,9 +207,8 @@
         if (gameRunning) moveRight();
     });
 
-    restartBtn.addEventListener('click', initGame);
+    restartBtn.addEventListener('click', startCountdown);
 
-    // Écran titre
     ctx.fillStyle = '#111'; ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#f59e0b'; ctx.font = '30px Courier New'; ctx.textAlign = 'center';
     ctx.fillText('TURBO RACER', canvas.width/2, canvas.height/2);
